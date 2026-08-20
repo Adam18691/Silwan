@@ -2,25 +2,30 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>سِلْوَان - مملكتك تنتظرك</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="splash-screen">
-<div class="background-particles" id="particles"></div>
-<div class="glow-orb"></div>
-<div class="content">
-<div class="ring-container">
-<svg class="ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="85" fill="none" stroke="#C9A96E" stroke-width="6" stroke-dasharray="520 20" stroke-linecap="round"/><circle cx="100" cy="100" r="70" fill="none" stroke="#C9A96E" stroke-width="2" opacity="0.4"/><path d="M70 100 Q85 70 100 100 Q115 130 130 100" fill="none" stroke="#C9A96E" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="100" r="6" fill="#D4AF37" opacity="0.8"/></svg>
+  <div class="background-particles" id="particles"></div>
+  <div class="glow-orb"></div>
+  <div class="content">
+    <div class="ring-container">
+      <svg class="ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="85" fill="none" stroke="#C9A96E" stroke-width="6" stroke-dasharray="520 20" stroke-linecap="round"/><circle cx="100" cy="100" r="70" fill="none" stroke="#C9A96E" stroke-width="2" opacity="0.4"/><path d="M70 100 Q85 70 100 100 Q115 130 130 100" fill="none" stroke="#C9A96E" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="100" r="6" fill="#D4AF37"><animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite"/></circle></svg>
+    </div>
+    <h1 class="app-name">سِلْوَان</h1>
+    <p class="sub-title">مملكتك تنتظرك</p>
+    <div class="loading-bar-container"><div class="loading-bar" id="loadingBar"></div></div>
+    <p class="loading-text" id="loadingText">جاري تجهيز مملكتك...</p>
+  </div>
+  <button class="skip-btn" id="skipBtn">تخطي</button>
 </div>
-<h1 class="app-name">سِلْوَان</h1>
-<p class="sub-title">مملكتك تنتظرك</p>
-<div class="loading-bar-container"><div class="loading-bar" id="loadingBar"></div></div>
-<p class="loading-text" id="loadingText">جاري تجهيز مملكتك...</p>
-</div>
-<button class="skip-btn" id="skipBtn">تخطي</button>
+
+<div id="kingdom" style="display:none">
+  <header><h2>👑 مملكة سِلْوَان</h2><p>تم بناء مملكتك - 1000 خاتم جاهز</p></header>
+  <div id="rings-grid" class="grid"></div>
 </div>
 <script src="script.js"></script>
 </body>
