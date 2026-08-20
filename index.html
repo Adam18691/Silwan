@@ -2,31 +2,65 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>سِلْوَان - مملكتك تنتظرك</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مملكة سِلْوَان 👑</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="splash-screen">
-  <div class="background-particles" id="particles"></div>
-  <div class="glow-orb"></div>
-  <div class="content">
-    <div class="ring-container">
-      <svg class="ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="85" fill="none" stroke="#C9A96E" stroke-width="6" stroke-dasharray="520 20" stroke-linecap="round"/><circle cx="100" cy="100" r="70" fill="none" stroke="#C9A96E" stroke-width="2" opacity="0.4"/><path d="M70 100 Q85 70 100 100 Q115 130 130 100" fill="none" stroke="#C9A96E" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="100" r="6" fill="#D4AF37"><animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite"/></circle></svg>
-    </div>
-    <h1 class="app-name">سِلْوَان</h1>
-    <p class="sub-title">مملكتك تنتظرك</p>
-    <div class="loading-bar-container"><div class="loading-bar" id="loadingBar"></div></div>
-    <p class="loading-text" id="loadingText">جاري تجهيز مملكتك...</p>
+<header>
+  <b id="appTitle">👑 مملكة سِلْوَان</b>
+  <div style="display:flex;gap:8px">
+    <button class="btn" onclick="toggleLang()" id="langBtn">EN</button>
+    <button class="btn" onclick="toggleStructure()">🏛️ الهيكلة</button>
   </div>
-  <button class="skip-btn" id="skipBtn">تخطي</button>
+</header>
+
+<div id="structureView" class="detail-box" style="display:none">
+  <h3 id="structTitle">🏛️ هيكلة المملكة</h3>
+  <div id="structDetails">جاري الحساب...</div>
+  <hr style="border-color:#334155;margin:12px 0">
+  <p><b>InstaPay:</b> waeldeban@instapay</p>
+  <p><b>طرق الدفع:</b> <span id="payText">149ج اشتراك شهري / 299ج خاتم مميز / 500ج باك 5 خواتم</span></p>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn-gold btn" onclick="subscribe('monthly')" id="btn1">اشترك 149ج</button>
+    <button class="btn-gold btn" onclick="subscribe('khatem')" id="btn2">خاتم 299ج</button>
+    <button class="btn-gold btn" onclick="subscribe('pack5')" id="btn3">باك 500ج</button>
+  </div>
 </div>
 
-<div id="kingdom" style="display:none">
-  <header><h2>👑 مملكة سِلْوَان</h2><p>تم بناء مملكتك - 1000 خاتم جاهز</p></header>
-  <div id="rings-grid" class="grid"></div>
+<div class="detail-box" id="kingdomInfo">
+  <h2 style="margin:0">👑 مملكة سِلْوَان</h2>
+  <p id="kingdomStatus">تم بناء مملكتك - 1000 خاتم جاهز</p>
 </div>
+
+<div id="rings" class="ring-grid"></div>
+
 <script src="script.js"></script>
+<script src="js/pay.js"></script>
+<script>
+let lang='ar';
+const texts={
+ ar:{title:'👑 مملكة سِلْوَان',status:'تم بناء مملكتك - 1000 خاتم جاهز',struct:'🏛️ هيكلة المملكة',pay:'149ج اشتراك شهري / 299ج خاتم مميز / 500ج باك 5 خواتم',b1:'اشترك 149ج',b2:'خاتم 299ج',b3:'باك 500ج'},
+ en:{title:'👑 Silwan Kingdom',status:'Your kingdom built - 1000 rings ready',struct:'🏛️ Kingdom Structure',pay:'149 EGP monthly / 299 EGP special ring / 500 EGP 5-pack',b1:'Join 149',b2:'Ring 299',b3:'Pack 500'}
+};
+function toggleLang(){
+ lang=lang==='ar'?'en':'ar';
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+ document.getElementById('langBtn').innerText=lang==='ar'?'EN':'AR';
+ document.getElementById('appTitle').innerText=texts[lang].title;
+ document.getElementById('kingdomStatus').innerText=texts[lang].status;
+ document.getElementById('structTitle').innerText=texts[lang].struct;
+ document.getElementById('payText').innerText=texts[lang].pay;
+ document.getElementById('btn1').innerText=texts[lang].b1;
+ document.getElementById('btn2').innerText=texts[lang].b2;
+ document.getElementById('btn3').innerText=texts[lang].b3;
+ render();
+}
+function toggleStructure(){
+ const el=document.getElementById('structureView');
+ el.style.display=el.style.display==='none'?'block':'none';
+}
+</script>
 </body>
 </html>
