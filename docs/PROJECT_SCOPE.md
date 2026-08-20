@@ -94,11 +94,4 @@ Silwan/
 ├── docs/
 └── infrastructure/
 
-ثم:
-
-**Commit changes**
-
-واكتب رسالة:
-
-```text
-Add Silwan project scope
+واAdd Silwan project scope
