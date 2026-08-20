@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: ./backend
+    container_name: silwan-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://silwan:silwan@db:5432/silwan
+      MODEL_PROVIDER: local
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: silwan-db
+    environment:
+      POSTGRES_DB: silwan
+      POSTGRES_USER: silwan
+      POSTGRES_PASSWORD: silwan_dev_only
+    ports:
+      - "5432:5432"
+    volumes:
+      - silwan_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U silwan -d silwan"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  silwan_pgdata:
