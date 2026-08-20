@@ -93,5 +93,4 @@ Silwan/
 ├── tests/
 ├── docs/
 └── infrastructure/
-
-واAdd Silwan project scope
+Add Silwan project scope
