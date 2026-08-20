@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 
 from app.api.auth import router as auth_router
+from app.api.auth_register import router as register_router
+from app.api.auth_login import router as login_router
 
 
 app = FastAPI(
@@ -11,6 +13,8 @@ app = FastAPI(
 
 
 app.include_router(auth_router)
+app.include_router(register_router)
+app.include_router(login_router)
 
 
 @app.get("/")
