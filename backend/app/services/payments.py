@@ -1,145 +1,114 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-
-from app.services.payments import (
-    approve_payment,
-    create_payment_order,
-    get_payment_order,
-    reject_payment,
-    submit_payment_reference,
-)
-from app.services.plans import get_plan
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from enum import Enum
+from uuid import uuid4
 
 
-router = APIRouter(
-    prefix="/api/v1/payments",
-    tags=["Payments"],
-)
+class PaymentStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
-class CreatePaymentRequest(BaseModel):
-    user_id: int = Field(gt=0)
-    plan_id: str = Field(min_length=1)
+@dataclass
+class PaymentOrder:
+    id: str
+    user_id: int
+    plan_id: str
+    amount_egp: int
+    status: PaymentStatus
+    payment_reference: str | None
+    created_at: datetime
 
 
-class PaymentReferenceRequest(BaseModel):
-    payment_reference: str = Field(
-        min_length=3,
-        max_length=100,
+_orders: dict[str, PaymentOrder] = {}
+
+
+def create_payment_order(
+    user_id: int,
+    plan_id: str,
+    amount_egp: int,
+) -> PaymentOrder:
+    if user_id <= 0:
+        raise ValueError("Invalid user ID.")
+
+    if amount_egp <= 0:
+        raise ValueError(
+            "Payment amount must be greater than zero."
+        )
+
+    order = PaymentOrder(
+        id=str(uuid4()),
+        user_id=user_id,
+        plan_id=plan_id,
+        amount_egp=amount_egp,
+        status=PaymentStatus.PENDING,
+        payment_reference=None,
+        created_at=datetime.now(timezone.utc),
     )
 
+    _orders[order.id] = order
 
-@router.post("")
-async def create_payment(request: CreatePaymentRequest):
-    plan = get_plan(request.plan_id)
-
-    if plan is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Plan not found",
-        )
-
-    if plan.price_egp_monthly <= 0:
-        raise HTTPException(
-            status_code=400,
-            detail="The selected plan does not require payment.",
-        )
-
-    order = create_payment_order(
-        user_id=request.user_id,
-        plan_id=plan.id,
-        amount_egp=plan.price_egp_monthly,
-    )
-
-    return {
-        "id": order.id,
-        "user_id": order.user_id,
-        "plan_id": order.plan_id,
-        "amount_egp": order.amount_egp,
-        "currency": "EGP",
-        "status": order.status.value,
-        "payment_method": "instapay",
-        "instapay_handle": "waeldeban@instapay",
-        "payment_reference": order.payment_reference,
-        "created_at": order.created_at,
-    }
+    return order
 
 
-@router.get("/{order_id}")
-async def get_payment(order_id: str):
-    order = get_payment_order(order_id)
-
-    if order is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Payment order not found",
-        )
-
-    return {
-        "id": order.id,
-        "user_id": order.user_id,
-        "plan_id": order.plan_id,
-        "amount_egp": order.amount_egp,
-        "currency": "EGP",
-        "status": order.status.value,
-        "payment_reference": order.payment_reference,
-        "created_at": order.created_at,
-    }
-
-
-@router.post("/{order_id}/reference")
-async def add_payment_reference(
+def get_payment_order(
     order_id: str,
-    request: PaymentReferenceRequest,
-):
-    order = submit_payment_reference(
-        order_id,
-        request.payment_reference,
-    )
+) -> PaymentOrder | None:
+    return _orders.get(order_id)
+
+
+def submit_payment_reference(
+    order_id: str,
+    payment_reference: str,
+) -> PaymentOrder | None:
+    order = _orders.get(order_id)
 
     if order is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Payment order not found",
+        return None
+
+    if order.status != PaymentStatus.PENDING:
+        return order
+
+    reference = payment_reference.strip()
+
+    if not reference:
+        raise ValueError(
+            "Payment reference cannot be empty."
         )
 
-    return {
-        "id": order.id,
-        "status": order.status.value,
-        "payment_reference": order.payment_reference,
-        "message": "Payment reference submitted for review.",
-    }
+    order.payment_reference = reference
+
+    return order
 
 
-@router.post("/{order_id}/approve")
-async def approve_payment_order(order_id: str):
-    order = approve_payment(order_id)
+def approve_payment(
+    order_id: str,
+) -> PaymentOrder | None:
+    order = _orders.get(order_id)
 
     if order is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Payment order not found",
-        )
+        return None
 
-    return {
-        "id": order.id,
-        "status": order.status.value,
-        "message": "Payment approved.",
-    }
+    if order.status != PaymentStatus.PENDING:
+        return order
+
+    order.status = PaymentStatus.APPROVED
+
+    return order
 
 
-@router.post("/{order_id}/reject")
-async def reject_payment_order(order_id: str):
-    order = reject_payment(order_id)
+def reject_payment(
+    order_id: str,
+) -> PaymentOrder | None:
+    order = _orders.get(order_id)
 
     if order is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Payment order not found",
-        )
+        return None
 
-    return {
-        "id": order.id,
-        "status": order.status.value,
-        "message": "Payment rejected.",
-    }
+    if order.status != PaymentStatus.PENDING:
+        return order
+
+    order.status = PaymentStatus.REJECTED
+
+    return order
