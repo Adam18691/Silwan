@@ -6,6 +6,7 @@ from app.api.auth import router as auth_router
 from app.api.auth_login import router as login_router
 from app.api.auth_register import router as register_router
 from app.api.plans import router as plans_router
+from app.api.payments import router as payments_router
 from app.config import settings
 
 
@@ -14,21 +15,31 @@ app = FastAPI(
     version=settings.app_version,
     description=(
         "Silwan backend API for authentication, AI services, "
-        "and subscription plans."
+        "subscription plans, and secure payment requests."
     ),
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
 
-# CORS for Silwan mobile/web clients.
-# Restrict origins before production deployment.
+# CORS
+# قبل الإطلاق العام استبدل "*" بنطاقات التطبيق الفعلية.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=[
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+    ],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+    ],
 )
 
 
@@ -43,6 +54,9 @@ app.include_router(ai_router)
 # Subscription plans
 app.include_router(plans_router)
 
+# Payments
+app.include_router(payments_router)
+
 
 @app.get("/", tags=["System"])
 async def root() -> dict[str, str]:
@@ -54,6 +68,7 @@ async def root() -> dict[str, str]:
         "direction": settings.direction,
         "docs": "/docs",
         "health": "/health",
+        "ready": "/ready",
     }
 
 
