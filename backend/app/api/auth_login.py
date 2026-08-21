@@ -26,7 +26,13 @@ def login(
         select(User).where(User.email == data.email)
     )
 
-    if not user or not verify_password(
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+
+    if not verify_password(
         data.password,
         user.password_hash,
     ):
@@ -41,7 +47,9 @@ def login(
             detail="User account is inactive",
         )
 
-    token = create_access_token(user.id)
+    token = create_access_token(
+        user_id=user.id,
+    )
 
     return {
         "access_token": token,
